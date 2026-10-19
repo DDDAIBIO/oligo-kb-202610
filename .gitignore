@@ -34,3 +34,6 @@ Thumbs.db
 # 临时
 tmp/
 scratch/
+
+# 体积大的原始抓取文件（本地留档，不入 Git）
+*.xml
