@@ -144,6 +144,9 @@ label 原文（DESCRIPTION 段）：*"Each 1 mL of solution contains **2 mg of p
 
 </details>
 
+> 📌 本节延伸出的问题"**Patisiran 为什么必须静脉注射、能不能皮下打**"已沉淀为 FAQ：
+> `04_FAQ/FAQ_Patisiran为何静脉注射_v0.md`（三层锁定：颗粒物理 / 剂量体积 / 肝靶向；含 mRNA 疫苗 IM 反例与"换 GalNAc 就能 SC"的决策表）。
+
 ---
 
 ## §6 收尾（10 min）
