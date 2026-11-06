@@ -28,7 +28,12 @@
 | `02_技术方案/递送系统笔记_v0.md` | **递送总纲**：三条路线选择树 / GalNAc-ASGPR / LNP 四组分与表观 pKa / 肝外递送矩阵 / **免疫原性 9 条可计算特征** |
 | `99_原料/Patisiran_Onpattro_label_要点.md` | LNP 代表药拆解（脂质 24.1 mg : RNA 2 mg ≈ 12:1；**0 个 PS**；必需预处理） |
 | `99_原料/Vutrisiran_Amvuttra_label_要点.md` | GalNAc 代表药拆解（三价 GalNAc；25 mg Q3M）+ **与 Patisiran 的天然对照表** |
-| `术语表.md` | 累计 28 条 |
+| `02_技术方案/天然对照与肝外递送_D14.md` | TTR 天然对照（同靶点同公司，只换递送）+ 肝外七行矩阵 + Eteplirsen 肌肉数据 |
+| `02_技术方案/免疫原性拆解_D15.md` | 传感器对应表 + **9 条特征冻结为函数签名**（D16 合同的来源） |
+| `02_技术方案/D16实操_oligo_decorate.md` | **第一个脚本的实战手册**：记号规则 v2 / 6 个用例期望值 / 9 个函数提示 / 时间分配 |
+| `scripts/oligo_decorate_skeleton.py` | 脚手架：解析器已实现，9 个特征函数留白（`d`=DNA、`m/f/e/l`=2′修饰、`*`=PS） |
+| `scripts/test_expected.py` | 21 条断言，期望值经独立程序验证（改数字前先问） |
+| `术语表.md` | 累计 32 条 |
 
 ## 规范
 
