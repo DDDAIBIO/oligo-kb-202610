@@ -150,6 +150,7 @@
 - [x] **git 接回**（2026-11-10 完成）：`git init` → `remote add origin` → `fetch origin main` → **`git reset --mixed FETCH_HEAD`**（把分支指针接到远端 9e1d202，工作区文件不动）→ `add -A` → commit。**历史链完整，且本机可直接 `git push`**（凭据来自 Git Credential Manager，不再依赖 VSCode Sync）。
 - [ ] **D11 欠账**：速查表「代价」列（ΔTm 列可留到阶段二）
 - [x] **对比表补 2 行**（2026-11-10）：Patisiran（#11，PS=0 + LNP 50:10:38.5:1.5）+ Vutrisiran（#12，三价 GalNAc + C530…P43S6）。表一现 **12 行 × 10 列**，已程序校验。
+- [x] **W2 底表「24 款清单」**（2026-11-10）→ **`03_SOP/已上市寡核苷酸药物全清单_v0.md`**。实际是 **25 款**（FDA 曾批准，含 4 款撤市：fomivirsen / pegaptanib / mipomersen / **inotersen**）。「24」是 2025 年底口径（23 + defibrotide，或加欧盟独有的 volanesorsen）。对比表已覆盖 10 款，**待拆 15 款**（A 同平台多分子 / B GalNAc 全家桶 / C 撤市负样本 / D 新机制），**建议先做 C 批**。
 
 ---
 
@@ -211,7 +212,7 @@
 
 - [ ] ⭐ **git 接回**：本机 `oligo-kb` 无 `.git`（换机只拷了文件，历史只存在远端）→ `git init` + `remote add origin https://github.com/DDDAIBIO/oligo-kb-202610.git` + `fetch` 合并
 - [ ] **`oligo_decorate.py` code review**：把服务器上的实现发我（21 条断言过了几条 + 两处设计决定）
-- [ ] **12 月复查**：Cemdisiran 最终结果（PDUFA 2026-11）／zilganersen（Zanvastro，2026-09，仅二手单源，未入正式表）／bepirovirsen 中国与 EU 审评
+- [ ] **12 月复查**：Cemdisiran 最终结果（PDUFA 2026-11）／**Inotersen 是否全球撤市（欧盟 2026-12-01 停售）**／bepirovirsen 中国与 EU 审评
 - [ ] 把 `99_原料/nihms874289.pdf` 改名为 `Khvorova_2017_chemical-evolution.pdf`（上次改名因文件被占用失败）
 - [ ] 顺手删掉旧的 `AOC_study` 仓库（GitHub 网页端），避免以后搜东西混淆
 - [ ] 回原始文献核对 mRNA-1273 全长（~3,963 nt）与 poly(A) 尾长
