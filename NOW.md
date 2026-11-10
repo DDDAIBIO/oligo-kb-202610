@@ -140,17 +140,38 @@
 3. **C7**：已上市 GalNAc-siRNA 是 **7 款**不是 4 款 → cemdisiran 若获批是**第 8 款**（原写"第 5 款"）
 4. **C8**（今天新增）：del-desiran HARBOR **已确认失败**；`del-brax` 是另一个分子，别混
 
-### 🟢 下一步：W3（第 4 周）研发流程与计算切入点
+### 🟢 下一步：W3（第 4 周）研发流程与计算切入点 → **D18 学习包已就绪（11-11 开工）**
 
-> 主线：**靶点选择 → 序列设计 → 化学修饰 → 递送 → 体外/体内验证 → CMC → IND**
-> 产出：一张全链条图 + 每格标注"计算能做什么/不能做什么" + 圈出你该占的两格（验证层 = 你的老本行）。
+> 主线：**靶点选择 → 位点 → 序列设计 → 化学修饰 → 递送 → 体外 → 体内 → CMC/IND**（8 环节）
+> 横切一层：**专利 FTO**
+> 产出：《计算切入点地图 v1》（M1 第三份文档）+ 位点可及性扫描器 v0
 
-**开工前先清三笔欠账（顺序自选，见复盘 §3 的原因）**：
+**细则在 `../W3实施细则_1111-1117.md`（工作区根）**，七天卡片：
 
-- [x] **git 接回**（2026-11-10 完成）：`git init` → `remote add origin` → `fetch origin main` → **`git reset --mixed FETCH_HEAD`**（把分支指针接到远端 9e1d202，工作区文件不动）→ `add -A` → commit。**历史链完整，且本机可直接 `git push`**（凭据来自 Git Credential Manager，不再依赖 VSCode Sync）。
-- [ ] **D11 欠账**：速查表「代价」列（ΔTm 列可留到阶段二）
-- [x] **对比表补 2 行**（2026-11-10）：Patisiran（#11，PS=0 + LNP 50:10:38.5:1.5）+ Vutrisiran（#12，三价 GalNAc + C530…P43S6）。表一现 **12 行 × 10 列**，已程序校验。
-- [x] **W2 底表「24 款清单」**（2026-11-10）→ **`03_SOP/已上市寡核苷酸药物全清单_v0.md`**。实际是 **25 款**（FDA 曾批准，含 4 款撤市：fomivirsen / pegaptanib / mipomersen / **inotersen**）。「24」是 2025 年底口径（23 + defibrotide，或加欧盟独有的 volanesorsen）。对比表已覆盖 10 款，**待拆 15 款**（A 同平台多分子 / B GalNAc 全家桶 / C 撤市负样本 / D 新机制），**建议先做 C 批**。
+| 日 | 时长 | 主题 | 状态 |
+|---|---|---|---|
+| D18 11-11 周三 | 60 min | 全链条 8 环节 + 计算能/不能 + 我该占哪两格 | 🟢 **学习包已出** |
+| D19 11-12 周四 | 45 min | 靶点层：致病突变 > 天然 LoF > GWAS；gnomAD / MR | ⬜ |
+| D20 11-13 周五 | 45 min | 位点层：转录本 / 3′UTR vs CDS / SNP 掩蔽 **+ 补速查表「代价」列** | ⬜ |
+| D21 11-14 周六 | 2.5 h | 代码日：`scan_sites.py`（RNAplfold）**+ 顺手跑 oligo_decorate 断言** | ⬜ |
+| D22 11-15 周日 | 45 min | 验证层：RNA-seq 脱靶分析 SOP 骨架 | ⬜ |
+| D23 11-16 周一 | 45 min | 专利 FTO 三步法 | ⬜ |
+| D24 11-17 周二 | 90 min | 地图 v1 定稿 + W3 复盘（§3 断档原因**这次必须填**） | ⬜ |
+
+**D18 的三个结论（已写进 `02_技术方案/研发全链条与计算切入点_D18.md`，198 行）**：
+
+1. **串联不是并联**：8 环节各 50% 通关率 → 0.5⁸ ≈ **0.39%**。所以别平均用力，**找最弱环**。
+2. **A/B/C 三级**把"AI 赋能"拆开：A 可计算（能写伪代码）/ B 可预测（说得出训练集）/ C 只能实验。宣称 B 级却说不清训练集 = 空话。
+3. **你该占两格 = ② 位点层 + ⑥⑦ 验证层**。③ 设计层**不是蓝海**（siDirect 免费 20 年），差异化在"联合打分"（效力 × 种子脱靶 × 免疫基序 × 修饰代价）——正是 `oligo_decorate` 那 9 个特征。
+
+**反推四款药，崩在四格**：Inclisiran ①靶点最强→全通关／Revusiran ④化学／Eteplirsen ⑤递送／Pelacarsen ①因果链断。新增：del-desiran 崩在 ⑦体内（MARINA 到了、HARBOR 没用）。
+
+**开工前欠账状态**：
+
+- [x] **git 接回**（2026-11-10）：`fetch origin main` → `git reset --mixed FETCH_HEAD` → `add -A` → commit。历史完整，本机可直接 push。
+- [ ] **D11 欠账：速查表「代价」列** → 已排进 **D20 收尾 15 min** 的固定槽位（ΔTm 列留到阶段二）
+- [x] **对比表补 2 行**（Patisiran #11 / Vutrisiran #12）→ 表一 **12 行 × 10 列**
+- [x] **W2 底表 25 款清单** → `03_SOP/已上市寡核苷酸药物全清单_v0.md`（4 款撤市含 inotersen；对比表覆盖 10 款，**待拆 15 款，建议先拆 C 批三款撤市负样本**）
 
 ---
 
@@ -210,8 +231,8 @@
 
 ## 未完成的收尾（有空补）
 
-- [ ] ⭐ **git 接回**：本机 `oligo-kb` 无 `.git`（换机只拷了文件，历史只存在远端）→ `git init` + `remote add origin https://github.com/DDDAIBIO/oligo-kb-202610.git` + `fetch` 合并
-- [ ] **`oligo_decorate.py` code review**：把服务器上的实现发我（21 条断言过了几条 + 两处设计决定）
+- [x] ~~⭐ **git 接回**~~ → **2026-11-10 已完成**（`fetch origin main` → `git reset --mixed FETCH_HEAD` → `add -A` → commit；本机可直接 push）
+- [ ] **`oligo_decorate.py` code review**：已排进 **D21 开头 15 min**（跑 21 条断言，失败项贴回来）
 - [ ] **12 月复查**：Cemdisiran 最终结果（PDUFA 2026-11）／**Inotersen 是否全球撤市（欧盟 2026-12-01 停售）**／bepirovirsen 中国与 EU 审评
 - [ ] 把 `99_原料/nihms874289.pdf` 改名为 `Khvorova_2017_chemical-evolution.pdf`（上次改名因文件被占用失败）
 - [ ] 顺手删掉旧的 `AOC_study` 仓库（GitHub 网页端），避免以后搜东西混淆
