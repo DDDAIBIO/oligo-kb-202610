@@ -1,6 +1,6 @@
 # D16 · 实操日：写出你的第一个脚本 `oligo_decorate.py`（学习包）
 
-> 日期：2026-11-07 周六 ｜ 时长：2.5 h ｜ 前置：`免疫原性拆解_D15.md` §3（函数签名合同）
+> 日期：2026-11-07 周六 ｜ 时长：2.5 h ｜ 前置：`免疫原性拆解_D15.md` §3（函数签名合同）  
 > 标签：#实操 #特征工程 #第一个脚本 #D16 #计算方向起点
 
 ---
@@ -11,12 +11,14 @@
 
 **已有的两份脚手架**（`scripts/`，已提交）：
 
-| 文件 | 里面是什么 | 你要做什么 |
-|---|---|---|
+| 文件                           | 里面是什么                                         | 你要做什么                                     |
+| ---------------------------- | --------------------------------------------- | ----------------------------------------- |
 | `oligo_decorate_skeleton.py` | 记号解析器（**已实现**，别改）+ 9 个特征函数的**空壳**（签名+文档+TODO） | 复制为 `oligo_decorate.py`，在原位把 9 个 TODO 实现掉 |
-| `test_expected.py` | 21 条断言，期望值已用独立程序算死 | 实现 → 跑它 → 全 PASS 为验收 |
+| `test_expected.py`           | 21 条断言，期望值已用独立程序算死                            | 实现 → 跑它 → 全 PASS 为验收                      |
 
 > ⚠️ **实现要在原位替换 stub，不要追加到文件末尾**——骨架的 `if __name__ == "__main__"` 在中部，追加的函数在 `main()` 执行时还没定义，会得到莫名其妙的 `NotImplementedError`（我验证时自己踩了）。
+
+
 
 ---
 
@@ -44,14 +46,14 @@ mC*mGmUmAmCdTdCdGdAdTdCdGdTdAdAmUmGmUmA*mC
 
 ## 2. 测试用例与期望值（算死的合同，`test_expected.py` 里也是这份）
 
-| # | 输入 | len | PS | 2'修饰 | GC% | DNA-CpG | 基序命中 |
-|---|---|---|---|---|---|---|---|
-| T0 | D15 手算 gapmer（见上） | 20 | 2 | m×10 | 45.0 | **2**（全串 CG 是 3——翼里的 CG 不算！） | 无 |
-| T1 | Nusinersen [文献序列待核] | 18 | **17** | e×18 | 38.9 | **0（全是 RNA）** | U-run×1 @4 |
-| T2 | Patisiran 风格 [合成] | 21 | **0** | m×10（只修饰嘧啶） | 52.4 | 0 | 无 |
-| T3 | `GGGUGUCCUUCAAGGGAAAA` | 20 | 0 | — | 50.0 | 0 | GUCCUUCAA @4 |
-| T4 | `AAUUUAGCAUUUAGCAUUUAG` | 21 | 0 | — | 23.8 | 0 | AUUUA @[1,8,15] |
-| T5 | `UG*mGICAUmGICC` | 11 | 1 | m×2 | **72.7**（I 按 G 计） | 0 | 无（不许崩） |
+| #  | 输入                      | len | PS     | 2'修饰        | GC%               | DNA-CpG                      | 基序命中            |
+| -- | ----------------------- | --- | ------ | ----------- | ----------------- | ---------------------------- | --------------- |
+| T0 | D15 手算 gapmer（见上）       | 20  | 2      | m×10        | 45.0              | **2**（全串 CG 是 3——翼里的 CG 不算！） | 无               |
+| T1 | Nusinersen [文献序列待核]     | 18  | **17** | e×18        | 38.9              | **0（全是 RNA）**                | U-run×1 @4      |
+| T2 | Patisiran 风格 [合成]       | 21  | **0**  | m×10（只修饰嘧啶） | 52.4              | 0                            | 无               |
+| T3 | `GGGUGUCCUUCAAGGGAAAA`  | 20  | 0      | —           | 50.0              | 0                            | GUCCUUCAA @4    |
+| T4 | `AAUUUAGCAUUUAGCAUUUAG` | 21  | 0      | —           | 23.8              | 0                            | AUUUA @[1,8,15] |
+| T5 | `UG*mGICAUmGICC`        | 11  | 1      | m×2         | **72.7**（I 按 G 计） | 0                            | 无（不许崩）          |
 
 **每个用例都在防一个真实的坑**：
 
@@ -67,17 +69,17 @@ mC*mGmUmAmCdTdCdGdAdTdCdGdTdAdAmUmGmUmA*mC
 
 ## 3. 你要实现的 9 个函数（签名 = D15 合同，返回值不许改）
 
-| TODO | 函数 | v0 实现提示 | 防的坑 |
-|---|---|---|---|
-| 1 | `count_cpg(info)` | 遍历相邻对，两位都 `is_dna` 且 C,G | 跨区段边界（T0 的翼 CG） |
-| 2 | `find_gu_motifs(bases)` | 硬编码最小表；U-run≥3 键名 **"U3"** | 别假装 motif 表完备 |
-| 3 | `find_au_rich(bases)` | 搜 `AUUUA`，与 2 允许重叠 | — |
-| 5 | `max_self_complement(bases)` | 先写反向互补（A↔U、C↔G、I 按 G、T 按 A），窗口 4–8 | **不是**折叠预测，注释里写"粗筛" |
-| 6a | `gc_content(bases)` | (C+G+I)/len；空序列 raise | I 的归类 |
-| 6b | `tm_wallace(bases)` | `2*(A+U) + 4*(G+C+I)`；**占位公式，注明** | ΔTm 修正是 D11 欠账，v0 明确不做 |
-| 7 | `find_hairpins(bases)` | stem 4–8 + loop 固定 4 | 同 5，粗筛 |
-| 8 | `ps_profile(ps_positions)` | `{"total":…, "positions":[…]}` | 位置换算在 main（见骨架 TODO） |
-| 9 | `g_run_count(bases, k=4)` | 连续 ≥4 个 G 的 run 数 | — |
+| TODO | 函数                           | v0 实现提示                            | 防的坑                    |
+| ---- | ---------------------------- | ---------------------------------- | ---------------------- |
+| 1    | `count_cpg(info)`            | 遍历相邻对，两位都 `is_dna` 且 C,G           | 跨区段边界（T0 的翼 CG）        |
+| 2    | `find_gu_motifs(bases)`      | 硬编码最小表；U-run≥3 键名 **"U3"**         | 别假装 motif 表完备          |
+| 3    | `find_au_rich(bases)`        | 搜 `AUUUA`，与 2 允许重叠                 | —                      |
+| 5    | `max_self_complement(bases)` | 先写反向互补（A↔U、C↔G、I 按 G、T 按 A），窗口 4–8 | **不是**折叠预测，注释里写"粗筛"    |
+| 6a   | `gc_content(bases)`          | (C+G+I)/len；空序列 raise              | I 的归类                  |
+| 6b   | `tm_wallace(bases)`          | `2*(A+U) + 4*(G+C+I)`；**占位公式，注明**  | ΔTm 修正是 D11 欠账，v0 明确不做 |
+| 7    | `find_hairpins(bases)`       | stem 4–8 + loop 固定 4               | 同 5，粗筛                 |
+| 8    | `ps_profile(ps_positions)`   | `{"total":…, "positions":[…]}`     | 位置换算在 main（见骨架 TODO）   |
+| 9    | `g_run_count(bases, k=4)`    | 连续 ≥4 个 G 的 run 数                  | —                      |
 
 **两个设计决定（骨架注释里已留了题）**：
 
@@ -88,18 +90,18 @@ mC*mGmUmAmCdTdCdGdAdTdCdGdTdAdAmUmGmUmA*mC
 
 ## 4. 时间分配（2.5 h）
 
-| 段 | 时长 | 内容 |
-|---|---|---|
+| 段 | 时长     | 内容                                                            |
+| - | ------ | ------------------------------------------------------------- |
 | 1 | 30 min | 读骨架头注释 + 记号规则；跑 `python test_expected.py` 看全部 FAIL（这就是你的待办清单） |
-| 2 | 60 min | 实现 TODO 1/2/3/8/9 + 6a（纯计数/扫描，生信基本功） |
-| 3 | 40 min | 实现 5/6b/7（反向互补 + 窗口扫描）+ main 的 PS 位置换算 |
-| 4 | 20 min | 全 PASS → 跑 CLI `--seq`（用 T0 那条）→ 把完整报告贴进本文件 §5 |
-| 5 | 20 min | commit + **发我 review（必做，我会按工程标准挑毛病）** |
+| 2 | 60 min | 实现 TODO 1/2/3/8/9 + 6a（纯计数/扫描，生信基本功）                          |
+| 3 | 40 min | 实现 5/6b/7（反向互补 + 窗口扫描）+ main 的 PS 位置换算                        |
+| 4 | 20 min | 全 PASS → 跑 CLI `--seq`（用 T0 那条）→ 把完整报告贴进本文件 §5                |
+| 5 | 20 min | commit + **发我 review（必做，我会按工程标准挑毛病）**                         |
 
 CLI 验收命令（输出应含 9 项 + 修饰统计）：
 
 ```
-python oligo_decorate.py --seq "mC*mGmUmAmCdTdCdGdAdTdCdGdTdAdAmUmGmUmA*mC"
+python oligo_decorate.py --seq "mC*mGmUmAmCdTdCdGdAdTdCdGdTdAdAmUmGmUmA*mC
 ```
 
 参考输出（我验证骨架+实现时得到的，你实现后数字应一致）：
@@ -116,6 +118,43 @@ PS 分布: {'total': 2, ...} | G-run(>=4): 0
 
 ```
 # TODO: 把 python test_expected.py 的全 PASS 截图/文本 + CLI 完整报告贴到这里
+PASS T0 len | got: 20 | want: 20
+PASS T0 PS total | got: 2 | want: 2
+PASS T0 DNA-CpG | got: 2 | want: 2
+PASS T0 GC% | got: 45.0 | want: 45.0
+PASS T0 mod counts: 2'-OMe 个数 | got: 10 | want: 10
+PASS T0 motif hits 为空 | got: {} | want: {}
+PASS T1 len | got: 18 | want: 18
+PASS T1 PS total | got: 17 | want: 17
+PASS T1 2'-MOE 个数 | got: 18 | want: 18
+PASS T1 DNA-CpG=0（全是 RNA！） | got: 0 | want: 0
+PASS T1 U-run>=3 命中 1 处（0-based 4） | got: [4] | want: [4]
+PASS T2 len | got: 21 | want: 21
+PASS T2 PS=0（Patisiran 无硫代！） | got: 0 | want: 0
+PASS T2 2'-OMe 个数 | got: 10 | want: 10
+PASS T2 GC% | got: 52.4 | want: 52.4
+PASS T3 GUCCUUCAA @0-based 4 | got: [4] | want: [4]
+PASS T4 AUUUA x3 | got: [1, 8, 15] | want: [1, 8, 15]
+PASS T5 len（含 I 照常计数） | got: 11 | want: 11
+PASS T5 PS=1 | got: 1 | want: 1
+PASS T5 2'-OMe=2 | got: 2 | want: 2
+PASS T5 GC% (I 按 G) | got: 72.7 | want: 72.7
+
+全部 21 项通过。下一步：跑 CLI 看完整报告 -> 贴进笔记 -> commit -> 找 AI review。
+
+=== oligo_decorate 设计体检报告 ===
+输入记号 : mC*mGmUmAmCdTdCdGdAdTdCdGdTdAdAmUmGmUmA*mC
+长度     : 20 nt
+PS 数    : 2
+GC%      : 45.0
+DNA-CpG  : 2 (仅 DNA 区，TLR9)
+GU/U 基序: {} (TLR7/8)
+AUUUA    : []
+最长自互补: 4 nt（粗筛）
+基础 Tm  : 58.0 °C（Wallace 占位，未做修饰修正）
+发夹粗筛 : []
+PS 分布  : {'total': 2, 'positions': [0, 18]}
+G-run(>=4): 0
 ```
 
 ---
