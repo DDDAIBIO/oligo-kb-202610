@@ -147,9 +147,9 @@
 
 **开工前先清三笔欠账（顺序自选，见复盘 §3 的原因）**：
 
-- [ ] **git 接回**：本机 `oligo-kb` 无 `.git`（换机只拷了文件）→ `git init` + 挂远端 `DDDAIBIO/oligo-kb-202610`
+- [x] **git 接回**（2026-11-10 完成）：`git init` → `remote add origin` → `fetch origin main` → **`git reset --mixed FETCH_HEAD`**（把分支指针接到远端 9e1d202，工作区文件不动）→ `add -A` → commit。**历史链完整，且本机可直接 `git push`**（凭据来自 Git Credential Manager，不再依赖 VSCode Sync）。
 - [ ] **D11 欠账**：速查表「代价」列（ΔTm 列可留到阶段二）
-- [ ] **对比表补 2 行**：Patisiran / Vutrisiran（材料已在 `99_原料/`，10 min）
+- [x] **对比表补 2 行**（2026-11-10）：Patisiran（#11，PS=0 + LNP 50:10:38.5:1.5）+ Vutrisiran（#12，三价 GalNAc + C530…P43S6）。表一现 **12 行 × 10 列**，已程序校验。
 
 ---
 
