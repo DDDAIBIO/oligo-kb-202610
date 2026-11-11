@@ -151,8 +151,8 @@
 |---|---|---|---|
 | D18 11-11 周三 | 60 min | 全链条 8 环节 + 计算能/不能 + 我该占哪两格 | ✅ **已完成**（202 行） |
 | D19 11-12 周四 | 45 min | 靶点层：遗传学三级阶梯 + gnomAD/MR + 6 维打分卡 | ✅ **已完成**（224 行） |
-| D20 11-13 周五 | 45 min | 位点层：三种"打不到" + 转录本/区室 + 可及性 + SNP 掩蔽 **+ 速查表代价表** | 🟢 **学习包已出**（208 行） |
-| D21 11-14 周六 | 2.5 h | 代码日：`scan_sites.py`（RNAplfold）**+ 顺手跑 oligo_decorate 断言** | ⬜ |
+| D20 11-13 周五 | 45 min | 位点层：三种"打不到" + 转录本/区室 + 可及性 + SNP 掩蔽 **+ 速查表代价表** | ✅ **已完成**（208 行；3 个数字已核，D11 欠账关闭） |
+| D21 11-14 周六 | 2.5 h | 代码日：`scan_sites.py`（RNAplfold）**+ 开头 15 min 跑 oligo_decorate 断言** | 🟢 **学习包已出**（174 行 + 骨架 97 行 + 测试 113 行，期望值已验证 12/12） |
 | D22 11-15 周日 | 45 min | 验证层：RNA-seq 脱靶分析 SOP 骨架 | ⬜ |
 | D23 11-16 周一 | 45 min | 专利 FTO 三步法 | ⬜ |
 | D24 11-17 周二 | 90 min | 地图 v1 定稿 + W3 复盘（§3 断档原因**这次必须填**） | ⬜ |
@@ -166,7 +166,7 @@
 
 **交付：10 条判据清单 = 明天 `scan_sites.py` 的函数规格**（load_transcripts / make_windows / coverage / compartment_ok / accessibility / window_access / overlay_variants / is_seed / pop_coverage）。
 
-**✅ D11 欠账已平**：`03_SOP/化学修饰速查表_v0.md` 新增 **§2.4 修饰的代价表**（PS/2′-F/2′-OMe/2′-MOE/LNA/m5C/GalNAc/m1Ψ/PEG/inv dT 各"买到什么/付出什么/谁付过"）。**只剩 3 个数字待你核**（Nusinersen PS 17/17、Donidalorsen 15/19、Inclisiran 31×2′-OMe+12×2′-F）。
+**✅ D11 欠账已平**：`03_SOP/化学修饰速查表_v0.md` 新增 **§2.4 修饰的代价表**（PS/2′-F/2′-OMe/2′-MOE/LNA/m5C/GalNAc/m1Ψ/PEG/inv dT 各"买到什么/付出什么/谁付过"）。✅ **3 个数字已核**（2026-11-13：Nusinersen PS 17/17、Donidalorsen 15/19、Inclisiran 31×2′-OMe+12×2′-F）——账目正式关闭，ΔTm 定量留阶段二。
 
 **D19 的四个结论**（`02_技术方案/靶点层_遗传学证据阶梯_D19.md`，224 行）：
 

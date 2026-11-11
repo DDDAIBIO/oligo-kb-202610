@@ -36,6 +36,9 @@
 | `02_技术方案/研发全链条与计算切入点_D18.md` | **计算切入点地图 v0.5**（M1 第三份文档）：8 环节 × 决策表 + A/B/C 分级 + 反推四款药 + 杠杆×数据 2×2 |
 | `02_技术方案/靶点层_遗传学证据阶梯_D19.md` | **靶点层判据**：三级阶梯（孟德尔 > 天然 LoF > GWAS）+ gnomAD/MR + **6 维打分卡** + 2 个反例（Pelacarsen / Fitusiran） |
 | `02_技术方案/位点层_靶哪一段_D20.md` | **位点层判据**：三种"打不到" + 转录本/区室 + 可及性 + SNP 掩蔽 + **10 条判据清单（= `scan_sites.py` 规格）** |
+| `02_技术方案/代码日_scan_sites_D21.md` | **代码日手册**：Part A 断言收尾 + v0 三决定 + 时间块 B0–B5 + RNAplfold/lunp 解析要点 |
+| `scripts/scan_sites_skeleton.py` | 位点扫描器骨架：8 纯函数 + 3 I/O + rank 留白（签名即合同） |
+| `scripts/test_scan_sites.py` | **12 条纯函数断言**（期望值已用参考实现验证 12/12）+ 3 条 I/O 冒烟（缺文件自动跳过） |
 | `02_技术方案/D16实操_oligo_decorate.md` | **第一个脚本的实战手册**：记号规则 v2 / 6 个用例期望值 / 9 个函数提示 / 时间分配 |
 | `scripts/oligo_decorate_skeleton.py` | 脚手架：解析器已实现，9 个特征函数留白（`d`=DNA、`m/f/e/l`=2′修饰、`*`=PS） |
 | `scripts/test_expected.py` | 21 条断言，期望值经独立程序验证（改数字前先问） |
