@@ -226,6 +226,46 @@ rank  start  end  seq  gc  mean_access  seed_hits  pop_cov  score
 
 ---
 
+## 8.5 B4/B5 实跑结果（2026-11-12，提前两天完成）
+
+**15/15 断言全绿**（S1–S12 纯函数 + I1/I2 真 RNAplfold 2.7.2 接入 + I3 变异管道）。`python scan_sites.py . variants.tsv siRNA` → 120 个窗口、`TTR_sites_ranked.tsv`。
+
+### 三条发现（B5）
+
+**① 可及性维在起作用，但产生了"岛聚集"（真信号）**
+top 10 里 rank 2–9 共 8 个窗口全部聚在 **260–331** 这 ~70 nt 区段——步长 5、窗口 21，相邻窗口重叠 16 nt，**同一个高可及性岛被切成了 8 份**。8 个"候选"本质上是 1 个位点。教训：排序表的行数 ≠ 可选设计数；v1 应按重叠 >50% 聚类合并取代表。rank 1（30–51）是另一个独立的岛。
+
+**② 满分饱和，五维里三维在这批数据上零区分力（预期内的 v0 简化）**
+top 10 全部 score=10：dim_cov=2（单转录本、21-mer 查自己恒 1.0）、dim_comp=2（无注释常数）、dim_snp=2（无变异重叠）——实际排序只由 acc+seq 两维决定。写代码时知道这些简化，**看到真数据才体会"地板维"的含义**。v1 解法：多异构体（cov 有信息）、RefSeq 注释（comp）、真 gnomAD（snp）。
+
+**③ ⚠️ pop_cov 全 1.000 + seed_hits 全 0 = 变异静默未命中（待诊断）**
+TSV 里明明造了 5 条变异（含 MAF 0.40），但没有任何窗口与任何变异重叠。两种解释：变异 pos 超出该转录本范围（TSV 可能对旧 fasta 造的）；或 **`load_variants` 只查 pos≥1 不查上限——静默缺口**，rank 里应加"max pos vs len(seq)"交叉校验。诊断命令见 §8.6。
+
+### 排查史（一天修 4 个静默型 bug，全是"不报错但错"）
+
+| # | bug | 表象 | 根因 |
+|---|---|---|---|
+| 1 | RNAplfold 默认不产 lunp | I1 段挂起 | 2.7+ 需显式 `-u 1`（踩坑记录 20261112） |
+| 2 | 位置参数 + 无 stdin | 死等无输出 | 2.7.2 忽略位置参数只读 stdin |
+| 3 | lunp 路径按文件名拼 | 找不到产物 | 前缀实为 FASTA 头行首词（NM_000371.4 ≠ ttr） |
+| 4 | I1 假阳性 FAIL | 15 PASS 1 FAIL | 目录混入 t100.fa，`load_transcripts(".")` 第一个值不是 TTR（测试设计缺陷，已修 e9b7536） |
+
+### §8.6 变异未命中诊断（跑这个，把输出贴回）
+
+```bash
+cat variants.tsv
+python - << 'EOF'
+import scan_sites as ss
+seq = next(iter(ss._read_fasta("ttr.fa").values()))
+print("seq len:", len(seq))
+vs = ss.load_variants("variants.tsv")
+print("解析到", len(vs), "条:", vs)
+print("超界(pos > seq len):", sum(1 for m, s, e in vs if e > len(seq)))
+EOF
+```
+
+---
+
 ## 9. 明日预告（D22 · 验证层）
 
 RNA-seq 脱靶分析 SOP 骨架：GUIDE-seq/CLEAN-seq 数据长什么样、比对到转录组还是基因组、怎么从 BAM 里数脱靶位点。这是你⑥⑦验证层的第一格——老本行，但要把它写成**能给湿实验同事用的 SOP**。
