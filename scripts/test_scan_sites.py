@@ -92,9 +92,12 @@ check("S12 overlap",
 # ---------- I/O 冒烟测试 (文件不存在则跳过) ----------
 
 if os.path.exists("ttr.fa"):
-    txs = ss.load_transcripts(".")
     acc = ss.accessibility("ttr.fa")
-    seq = list(txs.values())[0]
+    # ⭐ seq 必须从 ttr.fa 本身取, 不能用 load_transcripts(".") 的第一个值——
+    # 目录里若有其他 .fa (如诊断用的 t100.fa), glob 会把它扫进来且排在前面,
+    # 导致 I1 拿 TTR 的 acc 去和别的序列比长度 (2026-11-12 实际踩过)。
+    ttr = ss._read_fasta("ttr.fa")
+    seq = next(iter(ttr.values()))
     check("I1 acc len == seq len", len(acc) == len(seq))
     check("I2 acc values in [0,1]",
           all(0.0 <= p <= 1.0 for p in acc))
