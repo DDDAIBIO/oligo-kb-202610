@@ -167,7 +167,7 @@ def accessibility(fasta_path, workdir="."):
     base = os.path.splitext(os.path.basename(fasta_path))[0]
     lunp = os.path.join(workdir, base + "_lunp")
 
-    r = subprocess.run(["RNAplfold", "-W", "80", "-L", "40", fasta_path],
+    r = subprocess.run(["RNAplfold", "-W", "80", "-L", "40", "-u", "1", fasta_path],
                        cwd=workdir, capture_output=True, text=True)
     if r.returncode != 0:
         raise RuntimeError(f"RNAplfold 失败({r.returncode}): {r.stderr.strip()[:400]}")
