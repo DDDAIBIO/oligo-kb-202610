@@ -8,6 +8,9 @@
 
 from pathlib import Path
 
+import sys
+ss = sys.modules[__name__]
+
 
 # ---------- 纯函数区 (test_scan_sites.py 12 条断言的对象, B2 必须全绿) ----------
 
@@ -153,10 +156,35 @@ def _parse_lunp(path, seq_len):
     return [by_pos[p] for p in range(1, seq_len + 1)]
 
 def accessibility(fasta_path, workdir="."):
-    """subprocess 调 RNAplfold -W 80 -L 40, 解析生成的 lunp:
+    """subprocess 调 RNAplfold -W 80 -L 40 -u 1 (stdin 喂入), 解析 lunp。"""
+    fasta_path = os.path.abspath(fasta_path)
+    txs = _read_fasta(fasta_path)
+    if len(txs) != 1:
+        raise ValueError(f"{fasta_path} 应含且仅含 1 条序列, 实际 {len(txs)} 条")
+    seq_name = next(iter(txs))            # ⭐ 产物前缀取自 FASTA 头行首词, 不是文件名
+    seq = txs[seq_name]
+
+    lunp = os.path.join(workdir, seq_name + "_lunp")
+
+    with open(fasta_path, "rb") as fh:    # ⭐ stdin 喂入: 2.7.2 会忽略位置参数并死等 stdin
+        r = subprocess.run(["RNAplfold", "-W", "80", "-L", "40", "-u", "1"],
+                           cwd=workdir, stdin=fh, capture_output=True, text=True)
+    if r.returncode != 0:
+        raise RuntimeError(f"RNAplfold 失败({r.returncode}): {r.stderr.strip()[:400]}")
+    if not os.path.exists(lunp):
+        raise FileNotFoundError(f"没找到 {lunp}; 实际产物: {sorted(os.listdir(workdir))}; "
+                                f"stderr: {r.stderr.strip()[:400]}")
+
+    acc = _parse_lunp(lunp, len(seq))
+    assert len(acc) == len(seq), f"acc 长 {len(acc)} != 序列长 {len(seq)}"
+    return acc
+
+"""
+def accessibility(fasta_path, workdir="."):
+    subprocess 调 RNAplfold -W 80 -L 40, 解析生成的 lunp:
     跳过 '#' 开头的行, 每行取 [位置, P_unpaired] (第 2 列)。
     返回 0-based 数组, 长度必须 == 序列长度 (用 assert 检查)。
-    pos 是 1-based -> 数组下标 0-based, 换算处写注释 (review 重点)。"""
+    pos 是 1-based -> 数组下标 0-based, 换算处写注释 (review 重点)
     #raise NotImplementedError
     fasta_path = os.path.abspath(fasta_path)
     txs = _read_fasta(fasta_path)
@@ -177,6 +205,7 @@ def accessibility(fasta_path, workdir="."):
     acc = _parse_lunp(lunp, len(seq))
     assert len(acc) == len(seq), f"acc 长 {len(acc)} != 序列长 {len(seq)}"
     return acc
+"""
 
 def load_variants(tsv_path):
     """读 TSV (表头 pos/ref/alt/maf) -> [(maf, pos, pos+1), ...]
@@ -208,9 +237,170 @@ def load_variants(tsv_path):
 
 
 # ---------- 驱动区 (stretch goal: B4 完成后写) ----------
+# ---------- 驱动区 ----------
+
+def _score_dim_coverage(cov):
+    if cov < 0.5: return 0
+    if cov < 0.9: return 1
+    return 2
+
+
+def _score_dim_snp(win_variants, seed_variants):
+    """种子区 MAF>=5% -> 0; 窗内有变异 -> 1; 无 -> 2"""
+    if any(m >= 0.05 for m, _s, _e in seed_variants):
+        return 0
+    if win_variants:
+        return 1
+    return 2
+
+
+def _score_dim_seq(seq, gc):
+    """同碱基连跑>=5 或 GC<25%/>75% -> 0; GC<30%/70% -> 1; 否则 2"""
+    run = 1
+    for a, b in zip(seq, seq[1:]):
+        run = run + 1 if a == b else 1
+        if run >= 5:
+            return 0
+    if gc < 0.25 or gc > 0.75:
+        return 0
+    if gc < 0.30 or gc > 0.70:
+        return 1
+    return 2
+
 
 def rank(fasta_dir, variants_tsv, modality, L=21, step=5):
     """生成排序表 TSV (列见 D21 §7)。v0 简单加和打分, 不加权。"""
+    if modality == "splice_aso":
+        raise ValueError("v0 的 FASTA 是成熟 mRNA (无内含子), splice_aso 无候选位点; "
+                         "需要 pre-mRNA + 注释, 排 v1")
+
+    txs = ss.load_transcripts(fasta_dir)
+    if len(txs) != 1:
+        raise ValueError(f"v0 只支持单条转录本, 实际 {len(txs)} 条")
+    name, seq = next(iter(txs.items()))
+
+    variants = ss.load_variants(variants_tsv)
+    fa_files = sorted(p for p in os.listdir(fasta_dir) if p.endswith((".fa", ".fasta")))
+    if not fa_files:
+        raise FileNotFoundError(f"{fasta_dir} 下没有 .fa/.fasta")
+    fa = os.path.join(fasta_dir, fa_files[0])
+    acc = ss.accessibility(fa)
+
+    windows = ss.make_windows(seq, L, step)
+    if not windows:
+        raise ValueError(f"序列 {len(seq)} nt 短于窗口 {L}")
+
+    means = sorted(ss.window_access(acc, s, e) for s, e in windows)
+    n = len(means)
+    p30, p70 = means[int(0.30 * (n - 1))], means[int(0.70 * (n - 1))]
+    tx_list = list(txs.values())
+
+    rows = []
+    for s, e in windows:
+        wseq = seq[s:e]
+        gc = sum(b in "GC" for b in wseq) / L
+        mean_acc = ss.window_access(acc, s, e)
+        win_vars = ss.variants_in_window(variants, s, e)
+        seed_vars = ss.variants_in_window(variants, s + 1, s + 8)
+        pop_cov = ss.pop_coverage(win_vars)
+
+        dim_cov = _score_dim_coverage(ss.coverage(wseq, tx_list))
+        dim_comp = 2    # v0 无注释: 整条按 CDS 处理 (已知简化)
+        if mean_acc < p30:
+            dim_acc = 0
+        elif mean_acc > p70:
+            dim_acc = 2
+        else:
+            dim_acc = 1
+        dim_snp = _score_dim_snp(win_vars, seed_vars)
+        dim_seq = _score_dim_seq(wseq, gc)
+
+        rows.append({
+            "start": s, "end": e, "seq": wseq,
+            "gc": f"{gc * 100:.1f}", "mean_access": f"{mean_acc:.3f}",
+            "seed_hits": len(seed_vars), "pop_cov": f"{pop_cov:.3f}",
+            "score": dim_cov + dim_comp + dim_acc + dim_snp + dim_seq,
+        })
+
+    rows.sort(key=lambda r: (-r["score"], r["start"]))
+    return name, rows
+
+
+import csv
+
+COLS = ["rank", "start", "end", "seq", "gc", "mean_access", "seed_hits", "pop_cov", "score"]
+
+
+def format_table(name, rows, top=10):
+    """rows -> (打印用字符串, TSV 行列表)。不碰文件系统, 可测。"""
+    lines = [f"转录本: {name}   候选窗口: {len(rows)}   (v0 五维简单加和, 区室维恒 2)"]
+    lines.append("\t".join(COLS))
+    tsv = []
+    for i, r in enumerate(rows[:top], 1):
+        tsv.append({"rank": i, **{k: r[k] for k in COLS[1:]}})
+        lines.append("\t".join(str(tsv[-1][c]) for c in COLS))
+    return "\n".join(lines), tsv
+
+
+def main(argv=None):
+    argv = sys.argv[1:] if argv is None else argv
+    if len(argv) < 3:
+        print("用法: python scan_sites.py <fasta_dir> <variants.tsv> <modality> [L] [step]",
+              file=sys.stderr)
+        return 2
+    fasta_dir, variants_tsv, modality = argv[0], argv[1], argv[2]
+    L = int(argv[3]) if len(argv) > 3 else 21
+    step = int(argv[4]) if len(argv) > 4 else 5
+
+    try:
+        name, rows = rank(fasta_dir, variants_tsv, modality, L=L, step=step)
+    except (ValueError, FileNotFoundError, RuntimeError, AssertionError) as e:
+        print(f"错误: {e}", file=sys.stderr)
+        return 1
+
+    text, tsv_rows = format_table(name, rows)
+    print(text)
+    out = "TTR_sites_ranked.tsv"
+    with open(out, "w", encoding="utf-8", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=COLS, delimiter="\t", lineterminator="\n")
+        w.writeheader()
+        w.writerows(tsv_rows)
+    print(f"\n已写出 {out} (top {len(tsv_rows)}/{len(rows)})", file=sys.stderr)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+
+"""
+def _score_dim_coverage(cov):
+    if cov < 0.5: return 0
+    if cov < 0.9: return 1
+    return 2
+
+def _score_dim_snp(win_variants, seed_variants):
+    种子区 MAF>=5% -> 0; 窗内有变异 -> 1; 无 -> 2
+    if any(m >= 0.05 for m, _s, _e in seed_variants):
+        return 0
+    if win_variants:
+        return 1
+    return 2
+
+def _score_dim_seq(seq, gc):
+    同碱基连跑>=5 或 GC<25%/>75% -> 0; GC<30%/70% -> 1; 否则 2
+    run = 1
+    for a, b in zip(seq, seq[1:]):
+        run = run + 1 if a == b else 1
+        if run >= 5:
+            return 0
+    if gc < 0.25 or gc > 0.75:
+        return 0
+    if gc < 0.30 or gc > 0.70:
+        return 1
+    return 2
+
+def rank(fasta_dir, variants_tsv, modality, L=21, step=5):
+    生成排序表 TSV (列见 D21 §7)。v0 简单加和打分, 不加权。
     #raise NotImplementedError
     if modality == "splice_aso":
         raise ValueError("v0 的 FASTA 是成熟 mRNA (无内含子), splice_aso 无候选位点; "
@@ -222,7 +412,11 @@ def rank(fasta_dir, variants_tsv, modality, L=21, step=5):
     name, seq = next(iter(txs.items()))
 
     variants = ss.load_variants(variants_tsv)
-    fa = os.path.join(fasta_dir, sorted(os.listdir(fasta_dir))[0])
+    #fa = os.path.join(fasta_dir, sorted(os.listdir(fasta_dir))[0])
+    fa_files = sorted(p for p in os.listdir(fasta_dir) if p.endswith((".fa", ".fasta")))
+if not fa_files:
+    raise FileNotFoundError(f"{fasta_dir} 下没有 .fa/.fasta")
+    fa = os.path.join(fasta_dir, fa_files[0])
     acc = ss.accessibility(fa)
 
     windows = ss.make_windows(seq, L, step)
@@ -269,7 +463,7 @@ COLS = ["rank", "start", "end", "seq", "gc", "mean_access", "seed_hits", "pop_co
 
 
 def format_table(name, rows, top=10):
-    """rows -> (打印用字符串, TSV 行列表)。不碰文件系统, 可测。"""
+    rows -> (打印用字符串, TSV 行列表)。不碰文件系统, 可测
     lines = [f"转录本: {name}   候选窗口: {len(rows)}   (v0 五维简单加和, 区室维恒 2)"]
     lines.append("\t".join(COLS))
     tsv = []
@@ -312,4 +506,4 @@ if __name__ == "__main__":
 #if __name__ == "__main__":
 #    print("scan_sites skeleton — 全部函数待实现 (NotImplementedError)")
 #    print("先跑: python test_scan_sites.py  纯函数区全绿后, 再接 I/O 区")
-
+"""
