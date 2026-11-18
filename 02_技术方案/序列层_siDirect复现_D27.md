@@ -32,10 +32,32 @@ TCTGGAGAGCTGCATGGGCTCACAACTGAGGAGGAATTTGTAGAAGGGATATACAAAGTGGAAATAGACACCAAATCTTA
 
 **输出 top10（每条一行）**：
 
-| # | 片段内位置 | guide（反义链 19 nt）        | Ui-Tei | Amarzguioui | Reynolds 分 | seed Tm | → ttr.fa 全局位置 |
-| - | ----- | ----------------------- | ------ | ----------- | ---------- | ------- | ------------- |
-| 1 | 46-68 | GGGATATACAAAGTGGAAATAGA | U      |             |            | 20.1    | 285-307       |
-| … |       |                         |        |             |            |         |               |
+| # | 片段内位置 | → 全局 | guide 21 nt（5′→3′） | Ui-Tei 徽标 | seed Tm guide / passenger | 脱靶命中 guide +1/+2/+3 | GC | 备注 |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 46-68 | 285-307 | `UAUUUCCACUUUGUAUAUCCC`（**反向互补推得**，页面目视确认一次） | **U**（=通过） | 20.1 / 8.2 ℃ | 0 / 2 / 52 | ok | passenger 侧 2/6/61 |
+| 2 | | | | | | | | |
+| … | | | | | | | | |
+
+### 2.1 读表说明（截图逐列对齐，2026-11-18）
+
+siDirect 2.0 输出共 14 列，按用途分四组：
+
+| 组 | 列 | 含义 | 坑 |
+|---|---|---|---|
+| 定位 | target position | 输入序列上的靶位点范围（1-based，**含 2 nt 突出**，故长 23 nt） | +239 换算全局；长度 23 不是 21 |
+| 序列 | target sequence (21 nt target + 2 nt overhang) | 靶 mRNA 上的 23 nt | **这不是 guide**——它和 guide 反向互补 |
+| 序列 | RNA oligo sequences：21 nt guide / 21 nt passenger | 实际合成的两条 RNA（含 U，5′→3′） | guide 与 target 前 21 nt 反向互补（T→U），可当场校验转写对不对 |
+| 功能 | functional siRNA selection：**Ui-Tei 徽标** | 通过该规则显示徽标（U = Ui-Tei） | 只显示 Ui-Tei 徽标；Amarzguioui/Reynolds 若要打分得自己算（D28）或看页面其它选项 |
+| 稳定性 | seed-duplex stability (Tm)：guide / passenger | seed–靶双链 Tm，双阈值默认 <21.5℃ | **两个值**：guide 20.1（接近上限）、passenger 8.2——不对称在数值上可见 |
+| 特异性 | minimum number of mismatches against any off-targets（guide / passenger） | 对任一非靶转录本的最小错配数 | 各为 2 → 满足"≥2 错配"要求 |
+| 特异性 | **number of off-target hits with indicated mismatches (strand)** | 0/1/2/3 错配下各有多少个脱靶命中 | ⭐ **D29 `offtarget_scan.py` 的现成对照**：guide 3 错配仍有 **52** 个命中，passenger 侧 61 个 |
+| 质检 | target position / GC content | ok / 不过 | 布尔标记，别漏读 |
+
+**一个待核的读表细节 🟡**：guide 列 `0(+) 1` = 0 错配命中 1 个。这条 0 错配命中**大概就是靶 mRNA 本身**（on-target 被计入 off-target 统计），需回页面 [detail] 链接确认——**如果不确认就照抄，将来会把"1 个完美脱靶"这件事虚报出去**（D21 虚警的同型风险）。
+
+### 2.2 ⚠️ C12 更正（我的判断错误）
+
+上一轮我把你填在 Ui-Tei 列的 "U" 判为"疑为列名误抄"——**错了，那是页面上的 Ui-Tei 通过徽标**，你的记录方式是对的。同时你也确实抄错了另外一处：**guide 列填的是 target sequence（23 nt）不是 guide（21 nt）**，两者反向互补，用上面的校验规则一查就出来。**这条记进 C 系列：判断别人记录对不对之前，先看原始界面。**
 
 **坐标换算（本日最易错的坑，同 D25 链方向坑同型）**：
 
@@ -70,6 +92,7 @@ TCTGGAGAGCTGCATGGGCTCACAACTGAGGAGGAATTTGTAGAAGGGATATACAAAGTGGAAATAGACACCAAATCTTA
 4. 如果 siDirect top10 与可及性 top20 完全不重叠，你能立刻下结论"可及性没用"吗？为什么？
 5. 三套规则在 siDirect 里都有，为什么它还需要第四道 seed Tm 过滤？（提示：三规则管药效，不管什么？）
 6. 今天哪一步最容易产生静默错误？你打算怎么防？
+7. 页面上 guide 的 `0(+)` 命中数 = 1，这个"完美匹配的脱靶"最可能是什么？如果不核实就写进报告，会造成什么后果？
 
 ## 6. 事实边界
 
