@@ -48,6 +48,10 @@
 4. **GNA 放在哪、为什么能降脱靶？**（和 D25 热力学不对称、D26 pos19 冲突是不是同一层逻辑？）
 
 > ⚠️ 读的时候会撞上**二手源冲突**：2′-F 位点两说——pibb 说 sense 7/9/10/11（四条）+ guide 2/6/8/9/14/16；PMC 转述专利原则说 sense 9/10/11（三连，对应 guide 11–13 的 2′-OMe）。**这不是抄错，是不同代的模式/不同专利实施例**——今天要做的是把两说并列记下并标出来源，不要强行统一。
+>
+> ⚠️ **PS 位点也有两说（11-22 预读发现）**：Huang 2017（专利原则）= 两链 5′ 端各 2 个 PS；pibb 2018（DV18 图注）= **sense 5′ 端 2 个 + guide 5′、3′ 各 2 个（共 6 个）**。填 §4 的 PS 行时两说并列，D33 裁定。
+>
+> 📁 **三篇 PDF 已入库**（全文打印版，含图表；非出版社排版原版）：`99_原料/Debacker_2020_MolTher28_GalNAc_delivery_fulltext.pdf`（29 页）、`99_原料/Huang_2017_MTNA6_GalNAc_decorated_fulltext.pdf`（46 页）、`99_原料/pibb_2018_RNAi_evolution_CN_fulltext.pdf`（31 页）——不用再开网页，直接从仓库读。
 
 ## 4. 逐位坐标模板（读完后填，为 D34 的 schema 打底）
 
@@ -86,5 +90,6 @@
 | ESC 确切组成未公开；STC/ESC 无严格界限 | ✅ 综述原话 |
 | vutrisiran(ESC) vs revusiran(STC) 年剂量差 280× | ✅ **已核（11-22）**：Debacker 2020 *Mol Ther* 原文 "280-fold lower for vutrisiran … compared to … STC for revusiran"，同文另给绝对剂量 28 g/年 vs 100 mg/年（比值 280，自洽） |
 | 2′-F 位点具体位置 | 🟡 **两说并列**（pibb 四条 vs PMC 三连），D33 裁定 |
+| PS 位点分布 | 🟡 **两说并列**（Huang：两链 5′ 各 2 vs pibb/DV18：sense 5′×2 + guide 5′×2、3′×2 共 6 个），D33 裁定 |
 | GNA 在 guide 第 7 位降 seed 脱靶 | ✅ 双源；"第 7 位"是否通用 🟡 |
 | ESC+ 的 2′-OMe 钝化 seed（速查表已有表述） | 🟡 与 GNA 是两条并行策略，别混成一条 |
