@@ -27,11 +27,18 @@
 
 **读法**：不逐字读，按"主线 → 原则 → 具体模式"三档取料，每篇只取一件事。
 
-| 顺序 | 文章 | 只取 |
+| 顺序 | 文章（题录已按 PubMed 核实，2026-11-22） | 只取 |
 | --- | --- | --- |
-| 1 | Mol Ther—Nucleic Acids 2020 GalNAc 综述 | **主线**：STC → ESC → ESC+ 的演化与量化收益（剂量、时程）+ 5′-VP + Reversir |
-| 2 | PMC GalNAc 综述 | **原则**：ESC 的专利级描述四条 + 关键原话"**ESC 确切组成未公开**" |
-| 3 | pibb 中文综述 2018 | **具体模式**：DV18 逐位标注 + ESC+ 的 GNA 位置 |
+| 1 | **Debacker AJ, et al. 2020.** *Mol Ther* **28(8):1759–1771**. DOI `10.1016/j.ymthe.2020.06.015`；PMID 32592692；**PMC7403466（免费全文）** | **主线**：STC → ESC → ESC+ 的演化与量化收益（revusiran 28 g/年 vs vutrisiran 100 mg/年 = **280×**）+ 5′-VP（+10×）+ Reversir |
+| 2 | **Huang Y. 2017.** *Mol Ther Nucleic Acids* **6:116–132**. DOI `10.1016/j.omtn.2016.12.003`；PMID 28325278；**PMC5363494（免费全文）** | **原则**：ESC 专利级四条（AS 11/12/13 位 2′-OMe ↔ SS 9/10/11 位 2′-F；其余交替 F/OMe；**两链 5′ 端各 2 个 PS**；5′-VP）+ 关键原话 "exact chemical composition of ESC is **not disclosed**" |
+| 3 | **pibb 中文综述 2018**（《生物化学与生物物理进展》） | **具体模式**：DV18 逐位标注 + ESC+ 的 GNA 位置 |
+
+**取全文（都免费，不用登录）**：
+- 第 1 篇：<https://pmc.ncbi.nlm.nih.gov/articles/PMC7403466/> ｜ PDF 直链 `…/PMC7403466/pdf/main.pdf`
+- 第 2 篇：<https://pmc.ncbi.nlm.nih.gov/articles/PMC5363494/>
+- 第 3 篇：<https://www.pibb.ac.cn/pibbcn/article/html/20180249>
+
+> 🔧 **引用更正（11-22）**：上一版把两篇的刊名互换了——2020 Debacker 那篇在 *Mol Ther* **正刊**（PII `S1525-0016(20)30305-1`，不是 `S2162-2531`），真正发在 *Mol Ther Nucleic Acids* 上的是 2017 黄渊余那篇。两篇分工也因此更清楚：**2020 给主线与数字，2017 给专利原则与原话。**
 
 ### 四个导读问题（答案写进本笔记 §4 上方，允许标 🟡）
 
@@ -77,7 +84,7 @@
 | 陈述 | 状态 |
 | --- | --- |
 | ESC 确切组成未公开；STC/ESC 无严格界限 | ✅ 综述原话 |
-| vutrisiran(ESC) vs revusiran(STC) 年剂量差 280× | 🟡 单源转述，引用前回 Foster/公司稿 |
+| vutrisiran(ESC) vs revusiran(STC) 年剂量差 280× | ✅ **已核（11-22）**：Debacker 2020 *Mol Ther* 原文 "280-fold lower for vutrisiran … compared to … STC for revusiran"，同文另给绝对剂量 28 g/年 vs 100 mg/年（比值 280，自洽） |
 | 2′-F 位点具体位置 | 🟡 **两说并列**（pibb 四条 vs PMC 三连），D33 裁定 |
 | GNA 在 guide 第 7 位降 seed 脱靶 | ✅ 双源；"第 7 位"是否通用 🟡 |
 | ESC+ 的 2′-OMe 钝化 seed（速查表已有表述） | 🟡 与 GNA 是两条并行策略，别混成一条 |
